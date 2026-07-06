@@ -1,0 +1,13 @@
+{
+  "name": "tf-verival-orangehrm-e2e",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Testes E2E da jornada de solicitacao de licenca/folga no OrangeHRM.",
+  "scripts": {
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.61.1"
+  }
+}

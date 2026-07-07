@@ -7,6 +7,23 @@ const employeePassword = process.env.ORANGEHRM_EMPLOYEE_PASSWORD || 'P@ssw0rd123
 const leaveType = process.env.ORANGEHRM_LEAVE_TYPE || 'CAN - Vacation';
 const fromDate = process.env.ORANGEHRM_FROM_DATE || '2026-22-12';
 const toDate = process.env.ORANGEHRM_TO_DATE || '2026-23-12';
+const baseUrl = process.env.ORANGEHRM_BASE_URL || 'https://opensource-demo.orangehrmlive.com';
+
+test.use({
+  baseURL: baseUrl,
+  headless: false,
+  viewport: {
+    width: 1400,
+    height: 900,
+  },
+  launchOptions: {
+    slowMo: 300,
+  },
+});
+
+test.describe.configure({
+  timeout: 180_000,
+});
 
 test.describe('OrangeHRM - jornada de solicitacao de licenca/folga', () => {
   test('funcionario solicita licenca e admin aprova a solicitacao', async ({ page }) => {

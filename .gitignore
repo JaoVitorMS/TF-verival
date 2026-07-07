@@ -1,0 +1,10 @@
+# Local copy of the upstream OrangeHRM repository for analysis only.
+external/orangehrm/
+
+# Maven build output.
+tf-verival/target/
+
+# Node/Playwright dependencies and generated artifacts.
+node_modules/
+playwright-report/
+test-results/

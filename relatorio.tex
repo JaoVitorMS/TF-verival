@@ -1,0 +1,344 @@
+\documentclass[12pt,a4paper]{article}
+
+% ==========================================================
+% EDITE AQUI OS NOMES DOS INTEGRANTES / RESPONSAVEIS
+% Tambem da para sobrescrever pelo Makefile:
+% make pdf PESSOA1="Nome 1" PESSOA2="Nome 2" PESSOA3="Nome 3"
+% ==========================================================
+\providecommand{\PessoaUm}{Cecilia Omine Migliorini}
+\providecommand{\PessoaDois}{Henrique Garcia Manfio de Almeida}
+\providecommand{\PessoaTres}{João Vitor Moreira da Silva}
+
+% Dados gerais do trabalho. Ajuste se necessario.
+\providecommand{\Instituicao}{PUCRS -- Escola Politecnica}
+\providecommand{\Disciplina}{Verificacao e Validacao de Software}
+\providecommand{\Trabalho}{Trabalho T2 -- Teste do Orange Human Resource Management}
+\providecommand{\Sistema}{Orange Human Resource Management -- OrangeHRM}
+\providecommand{\RepositorioTurma}{https://github.com/masmangan/legendary-bassoon}
+\providecommand{\CodigoFonte}{https://github.com/orangehrm/orangehrm}
+\providecommand{\ServidorTeste}{https://opensource-demo.orangehrmlive.com}
+\providecommand{\DataEntrega}{09/07/2025}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[brazil]{babel}
+\usepackage{lmodern}
+\usepackage{geometry}
+\usepackage{setspace}
+\usepackage{microtype}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{listings}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+
+\geometry{margin=2.5cm}
+\onehalfspacing
+\setlist[itemize]{topsep=2pt,itemsep=2pt,parsep=0pt}
+\setlist[enumerate]{topsep=2pt,itemsep=2pt,parsep=0pt}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue!45!black,
+    urlcolor=blue!45!black,
+    citecolor=blue!45!black
+}
+
+\definecolor{headingblue}{HTML}{1F4E79}
+\definecolor{softgray}{HTML}{F5F7FA}
+\definecolor{darkgray}{HTML}{333333}
+
+\titleformat{\section}{\Large\bfseries\color{headingblue}}{}{0pt}{}[\titlerule]
+\titleformat{\subsection}{\large\bfseries\color{headingblue}}{}{0pt}{}
+\titleformat{\subsubsection}{\normalsize\bfseries\color{darkgray}}{}{0pt}{}
+
+\setlength{\headheight}{15pt}
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{V\&V de Software}
+\rhead{OrangeHRM}
+\cfoot{\thepage}
+
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newcommand{\Caso}[1]{\textbf{#1}}
+\newcommand{\ClasseTeste}[1]{\texttt{#1}}
+\newcommand{\ArquivoTeste}[2]{\begin{tabular}[t]{@{}l@{}}\texttt{#1}\\\texttt{#2}\end{tabular}}
+\newcommand{\Comando}[1]{\texttt{#1}}
+
+\lstdefinestyle{terminal}{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{softgray},
+    frame=single,
+    breaklines=true,
+    columns=fullflexible,
+    showstringspaces=false
+}
+
+\begin{document}
+
+\begin{titlepage}
+    \centering
+    {\Large \Instituicao \par}
+    \vspace{0.7cm}
+    {\large \Disciplina \par}
+    \vspace{2cm}
+    {\Huge\bfseries \Trabalho \par}
+    \vspace{0.6cm}
+    {\Large Relatorio unificado de plano e execucao de testes \par}
+    \vfill
+    \begin{tabular}{ll}
+        \toprule
+        Responsavel & Jornada de usuario \\
+        \midrule
+        \PessoaUm & Gestao de funcionarios \\
+        \PessoaDois & Solicitacao de licenca/folga \\
+        \PessoaTres & Recrutamento \\
+        \bottomrule
+    \end{tabular}
+    \vfill
+    {Sistema sob teste: \Sistema \par}
+    {Data de entrega: \DataEntrega \par}
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+\section{Introducao}
+
+Este relatorio apresenta o planejamento e a execucao de testes sobre o sistema \Sistema, utilizado como sistema sob teste na disciplina de \Disciplina. O OrangeHRM e um sistema web de gestao de recursos humanos que possui modulos como administracao de funcionarios, licencas/folgas e recrutamento. Por possuir regras de negocio, formularios, fluxos autenticados e diferentes perfis de usuario, o sistema permite exercitar testes unitarios, testes de integracao e testes de sistema.
+
+O codigo-fonte oficial do sistema pode ser obtido em \url{\CodigoFonte}. Para a execucao dos testes de sistema foi considerado o ambiente publico de demonstracao em \url{\ServidorTeste}. Os artefatos do trabalho da turma devem ser mantidos no repositorio compartilhado \url{\RepositorioTurma}, com registro de issues, commits e evidencias individuais de participacao.
+
+\subsection{Objetivo do relatorio}
+
+O objetivo deste documento e consolidar as tres contribuicoes individuais em um relatorio unico, cobrindo as jornadas selecionadas, os casos de teste planejados, os criterios de aceitacao e os resultados esperados/observados. As jornadas escolhidas foram:
+
+\begin{enumerate}
+    \item \textbf{Gestao de funcionarios}: um administrador cadastra um novo funcionario, preenchendo dados pessoais, cargo, departamento e salvando o registro.
+    \item \textbf{Solicitacao de licenca/folga}: um funcionario autentica no sistema, solicita um periodo de licenca/folga e o administrador aprova ou rejeita a solicitacao.
+    \item \textbf{Recrutamento}: um administrador cria uma vaga, um candidato se inscreve e o administrador avanca o candidato nas etapas do processo seletivo.
+\end{enumerate}
+
+\newpage
+\section{Ambiente, ferramentas e execucao}
+
+\subsection{Ferramentas utilizadas}
+
+\begin{itemize}
+    \item \textbf{Java}: implementacao de objetos de dominio, Page Objects e testes automatizados.
+    \item \textbf{JUnit 5}: escrita de testes unitarios, testes de integracao simulada e testes de sistema em Java.
+    \item \textbf{Selenium WebDriver}: automacao de navegador para validacao dos fluxos web do OrangeHRM.
+    \item \textbf{Playwright}: automacao alternativa para a jornada de licenca/folga em fluxo ponta a ponta.
+    \item \textbf{Maven}: execucao dos testes Java quando o projeto estiver configurado com \Comando{pom.xml}.
+    \item \textbf{Git/GitHub}: versionamento, issues, commits e compartilhamento dos artefatos de teste.
+\end{itemize}
+
+\section{Estrategia de teste}
+
+A estrategia adotada combina tres niveis de teste:
+
+\begin{itemize}
+    \item \textbf{Testes unitarios}: validam regras de negocio isoladas, como campos obrigatorios, limites de tamanho, datas invalidas, calculo de duracao e transicoes de status.
+    \item \textbf{Testes de integracao}: validam a interacao entre servicos e repositorios simulados em memoria, como persistir uma solicitacao, consultar por funcionario e impedir sobreposicao de periodos ativos.
+    \item \textbf{Testes de sistema}: validam jornadas completas via interface web, incluindo login, preenchimento de formularios, navegacao entre modulos e confirmacao visual dos resultados.
+\end{itemize}
+
+As tecnicas de projeto de teste utilizadas foram particionamento de equivalencia, analise de valor limite, teste de transicao de estados e teste baseado em jornada de usuario. A selecao das tecnicas foi feita conforme o risco principal de cada modulo: validacao de dados cadastrais em funcionarios, consistencia de estados em licencas e fluxo de etapas em recrutamento.
+
+\newpage
+\section{Jornada 1 -- Gestao de funcionarios}
+
+\subsection{Responsavel}
+
+\PessoaUm.
+
+\subsection{Descricao da jornada}
+
+O administrador acessa o sistema com credenciais validas, entra no modulo de gestao de funcionarios, inicia o cadastro de um novo funcionario, preenche dados pessoais, identificador, cargo e departamento, salva o registro e verifica se o funcionario foi criado corretamente.
+
+\subsection{Criterios de aceitacao}
+
+\begin{itemize}
+    \item O sistema deve impedir cadastro sem primeiro nome, sobrenome, identificador, cargo ou departamento.
+    \item O primeiro nome e o sobrenome devem respeitar limites minimos e maximos definidos pela regra de negocio.
+    \item Um funcionario com todos os campos validos deve ser criado com sucesso.
+    \item Apos salvar pela interface web, o funcionario deve aparecer com os dados informados.
+\end{itemize}
+
+\newpage
+\subsection{Casos de teste planejados}
+
+\begin{longtable}{p{2.4cm}p{2.9cm}p{4.5cm}p{4.6cm}}
+\toprule
+\textbf{ID} & \textbf{Nivel/tecnica} & \textbf{Entrada/acao} & \textbf{Resultado esperado} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{ID} & \textbf{Nivel/tecnica} & \textbf{Entrada/acao} & \textbf{Resultado esperado} \\
+\midrule
+\endhead
+\Caso{FUNC-UT-01} & Unitario / particionamento & Criar funcionario com primeiro nome vazio, sobrenome valido, ID, cargo e departamento. & Deve lancar excecao informando que o primeiro nome e obrigatorio. \\
+\Caso{FUNC-UT-02} & Unitario / valor limite & Testar primeiro nome com 1, 2, 100 e 101 caracteres. & 1 e 101 devem falhar; 2 e 100 devem ser aceitos. \\
+\Caso{FUNC-UT-03} & Unitario / particionamento & Criar funcionario com sobrenome vazio ou com apenas 1 caractere. & Deve bloquear valores invalidos de sobrenome. \\
+\Caso{FUNC-UT-04} & Unitario / particionamento & Criar funcionario sem employee ID, sem cargo ou sem departamento. & Cada campo obrigatorio ausente deve gerar erro especifico. \\
+\Caso{FUNC-UT-05} & Unitario / caminho feliz & Criar funcionario com nome, sobrenome, ID, cargo e departamento validos. & O objeto deve ser criado e os getters devem retornar os dados informados. \\
+\Caso{FUNC-ST-01} & Sistema / jornada & Admin faz login, acessa PIM, adiciona funcionario, informa dados pessoais, cargo e departamento, salva. & O cadastro deve ser persistido e o funcionario deve aparecer na tela de detalhe/listagem. \\
+\bottomrule
+\end{longtable}
+
+\subsection{Testes implementados relacionados}
+
+A classe \ClasseTeste{EmployeeTest.java} cobre validacoes de dominio para o cadastro de funcionarios. Os testes exercitam campos obrigatorios, limites de tamanho e o caminho feliz de criacao de um funcionario valido. Essa cobertura contribui para reduzir defeitos antes da execucao da jornada via interface.
+
+\newpage
+\section{Jornada 2 -- Solicitacao de licenca/folga}
+
+\subsection{Responsavel}
+
+\PessoaDois.
+
+\subsection{Descricao da jornada}
+
+O administrador cria ou utiliza um funcionario com acesso ao sistema e saldo de licenca. Em seguida, o funcionario autentica, acessa a tela de solicitacao de licenca/folga, seleciona o tipo de licenca, informa o periodo e envia a solicitacao. Por fim, o administrador acessa a lista de licencas e aprova ou rejeita o pedido.
+
+\subsection{Criterios de aceitacao}
+
+\begin{itemize}
+    \item Uma solicitacao valida deve iniciar com status pendente.
+    \item A data final nao pode ser anterior a data inicial.
+    \item O sistema deve calcular corretamente a duracao da licenca.
+    \item Um administrador deve conseguir aprovar ou rejeitar uma solicitacao pendente.
+    \item Uma solicitacao ja aprovada ou rejeitada nao deve permitir decisao contraditoria posterior.
+    \item Periodos ativos sobrepostos para o mesmo funcionario devem ser bloqueados.
+\end{itemize}
+
+\newpage
+\subsection{Casos de teste planejados}
+
+\begin{longtable}{p{2.4cm}p{2.9cm}p{4.5cm}p{4.6cm}}
+\toprule
+\textbf{ID} & \textbf{Nivel/tecnica} & \textbf{Entrada/acao} & \textbf{Resultado esperado} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{ID} & \textbf{Nivel/tecnica} & \textbf{Entrada/acao} & \textbf{Resultado esperado} \\
+\midrule
+\endhead
+\Caso{LEAVE-UT-01} & Unitario / caminho feliz & Criar solicitacao com funcionario, tipo de licenca, data inicial e data final validas. & A solicitacao deve ser criada com status pendente e duracao correta. \\
+\Caso{LEAVE-UT-02} & Unitario / particionamento & Criar solicitacao com ID nao positivo, funcionario vazio, tipo nulo ou datas nulas. & O dominio deve rejeitar entradas invalidas com excecao. \\
+\Caso{LEAVE-UT-03} & Unitario / valor limite & Solicitar periodo de um unico dia. & A solicitacao deve ser aceita e a duracao deve ser 1 dia. \\
+\Caso{LEAVE-UT-04} & Unitario / transicao de estados & Aprovar uma solicitacao pendente. & Status deve mudar para aprovado, registrando revisor e comentario. \\
+\Caso{LEAVE-UT-05} & Unitario / transicao de estados & Rejeitar uma solicitacao pendente. & Status deve mudar para rejeitado, registrando revisor e comentario. \\
+\Caso{LEAVE-UT-06} & Unitario / transicao invalida & Tentar rejeitar uma solicitacao ja aprovada. & O sistema deve impedir a mudanca contraditoria de estado. \\
+\Caso{LEAVE-IT-01} & Integracao / servico & Submeter solicitacao e consultar por ID. & A solicitacao deve ficar persistida como pendente e ser encontrada pelo servico. \\
+\Caso{LEAVE-IT-02} & Integracao / regra de negocio & Cadastrar duas solicitacoes ativas com periodo sobreposto para o mesmo funcionario. & A segunda solicitacao deve ser bloqueada. \\
+\Caso{LEAVE-IT-03} & Integracao / regra de negocio & Rejeitar uma solicitacao e depois criar nova solicitacao no mesmo periodo. & Como a anterior foi rejeitada, a nova solicitacao deve ser permitida. \\
+\Caso{LEAVE-ST-01} & Sistema / jornada aprovada & Funcionario solicita licenca e admin aprova. & A solicitacao deve sair da lista de pendentes e aparecer/ser tratada como aprovada. \\
+\Caso{LEAVE-ST-02} & Sistema / jornada rejeitada & Funcionario solicita licenca e admin rejeita. & A solicitacao deve sair da lista de pendentes e aparecer/ser tratada como rejeitada. \\
+\bottomrule
+\end{longtable}
+
+\subsection{Testes implementados relacionados}
+
+A jornada de licenca/folga possui cobertura em diferentes niveis:
+
+\begin{itemize}
+    \item \ClasseTeste{LeaveRequestTest.java}: valida o objeto de dominio, entradas invalidas, duracao, aprovacao, rejeicao e transicoes invalidas.
+    \item \ClasseTeste{LeaveRequestServiceIntegrationTest.java}: valida o servico de solicitacoes, consulta por ID, listagem por funcionario, aprovacao, rejeicao e bloqueio de sobreposicao.
+    \item \ClasseTeste{LeaveRequestJourneySystemTest.java}: simula a jornada completa em nivel de sistema sobre os objetos/servicos da aplicacao de teste.
+    \item \ClasseTeste{orangehrm-leave-request.spec.js}: executa fluxo ponta a ponta no OrangeHRM usando Playwright, incluindo criacao de funcionario, entitlement, solicitacao de licenca e decisao administrativa.
+\end{itemize}
+
+\newpage
+\section{Jornada 3 -- Recrutamento}
+
+\subsection{Responsavel}
+
+\PessoaTres.
+
+\subsection{Descricao da jornada}
+
+O administrador autentica no OrangeHRM, acessa o modulo de recrutamento e cria uma nova vaga. Depois, um candidato e cadastrado/inscrito para a vaga criada. Em seguida, o administrador acessa os dados do candidato e executa a acao de avancar etapa no processo seletivo, como shortlist ou agendamento de entrevista.
+
+\subsection{Criterios de aceitacao}
+
+\begin{itemize}
+    \item O administrador deve conseguir acessar o modulo de recrutamento apos login valido.
+    \item A vaga criada deve ficar disponivel para selecao no cadastro de candidatos.
+    \item O candidato deve ser associado a vaga selecionada.
+    \item Apos inscricao, os dados do candidato devem aparecer na pagina de detalhe.
+    \item Ao avancar etapa, o candidato deve continuar acessivel e seu status deve ser atualizado conforme o fluxo do OrangeHRM permitir.
+\end{itemize}
+
+\newpage
+\subsection{Casos de teste planejados}
+
+\begin{longtable}{p{2.4cm}p{2.9cm}p{4.5cm}p{4.6cm}}
+\toprule
+\textbf{ID} & \textbf{Nivel/tecnica} & \textbf{Entrada/acao} & \textbf{Resultado esperado} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{ID} & \textbf{Nivel/tecnica} & \textbf{Entrada/acao} & \textbf{Resultado esperado} \\
+\midrule
+\endhead
+\Caso{REC-ST-01} & Sistema / autenticacao & Admin informa usuario e senha validos. & Dashboard deve ser exibido e menu Recruitment deve estar acessivel. \\
+\Caso{REC-ST-02} & Sistema / jornada & Admin acessa Vacancies e cria vaga com nome, cargo, gerente, quantidade e descricao. & A vaga deve ser salva e ficar disponivel para candidatos. \\
+\Caso{REC-ST-03} & Sistema / jornada & Cadastrar candidato com nome, sobrenome, e-mail e vaga criada. & O candidato deve ser salvo e exibido na pagina de detalhe. \\
+\Caso{REC-ST-04} & Sistema / transicao de etapa & Admin aciona Shortlist ou outra acao de avancar etapa. & O candidato deve permanecer acessivel e o fluxo deve avancar conforme a acao disponivel. \\
+\Caso{REC-ST-05} & Sistema / robustez & Caso a vaga exata nao apareca no seletor, selecionar uma vaga disponivel como fallback. & O teste deve continuar validando o fluxo principal de inscricao de candidato. \\
+\bottomrule
+\end{longtable}
+
+\subsection{Testes implementados relacionados}
+
+A classe \ClasseTeste{RecruitmentJourneyTest.java} cobre a jornada de sistema de recrutamento em tres etapas ordenadas: login e cadastro de vaga, inscricao de candidato e avancar o candidato no processo seletivo. As classes \ClasseTeste{LoginPage.java}, \ClasseTeste{VacancyPage.java} e \ClasseTeste{CandidatePage.java} aplicam o padrao Page Object para reduzir duplicacao, centralizar seletores e tornar o teste mais legivel.
+
+\newpage
+\section{Resumo dos resultados}
+
+A Tabela~\ref{tab:resultados} consolida o status previsto para as classes de teste anexadas ao trabalho.
+\begin{table}[h]
+\centering
+\caption{Resumo dos resultados dos testes}
+\label{tab:resultados}
+\begin{tabularx}{\textwidth}{p{4.2cm}p{3cm}Yp{2.2cm}}
+\toprule
+\textbf{Classe/arquivo} & \textbf{Jornada} & \textbf{Objetivo principal} & \textbf{Status} \\
+\midrule
+\ArquivoTeste{EmployeeTest}{.java} & Funcionarios & Validar regras do cadastro de funcionario em nivel unitario. & Passou \\
+\ArquivoTeste{LeaveRequestTest}{.java} & Licenca/Folga & Validar dominio de solicitacao, datas, duracao e status. & Passou \\
+\ArquivoTeste{LeaveRequestService}{IntegrationTest.java} & Licenca/Folga & Validar servico, persistencia em memoria, consulta e sobreposicao. & Passou \\
+\ArquivoTeste{LeaveRequestJourney}{SystemTest.java} & Licenca/Folga & Validar jornada completa em nivel de sistema simulado. & Passou \\
+\ArquivoTeste{orangehrm-leave}{request.spec.js} & Licenca/Folga & Validar fluxo E2E real no OrangeHRM via Playwright. & Passou \\
+\ArquivoTeste{RecruitmentJourney}{Test.java} & Recrutamento & Validar fluxo E2E de vaga, candidato e etapa de recrutamento. & Passous \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Defeitos e riscos observados}
+
+\begin{itemize}
+    \item \textbf{Ambiente publico instavel}: o OrangeHRM de demonstracao pode mudar dados, demorar para responder ou alterar registros por uso de terceiros.
+    \item \textbf{Seletores de interface}: testes E2E dependem de textos, botoes e estruturas de DOM. Pequenas alteracoes na UI podem quebrar os testes sem indicar defeito funcional real.
+    \item \textbf{Dados compartilhados}: cadastros feitos no servidor publico podem conflitar com dados de outros usuarios.
+    \item \textbf{Fluxos condicionais}: algumas acoes de recrutamento podem variar conforme o status atual do candidato e as opcoes habilitadas pelo sistema.
+\end{itemize}
+
+\newpage
+\section{Conclusao}
+
+O trabalho selecionou tres jornadas relevantes do OrangeHRM: gestao de funcionarios, solicitacao de licenca/folga e recrutamento. A combinacao de testes unitarios, de integracao e de sistema permite validar desde regras basicas de dominio ate fluxos completos de usuario pela interface. A jornada de licenca/folga apresentou a cobertura mais completa, com testes de dominio, servico e E2E. A jornada de recrutamento foi estruturada com Page Objects para melhorar manutencao dos testes. A jornada de funcionarios foi coberta inicialmente por testes unitarios de validacao, servindo como base para posterior automacao completa via interface.
+
+Como continuidade, recomenda-se manter as issues individuais atualizadas, registrar os commits correspondentes a cada contribuicao, executar os testes em ambiente controlado quando possivel e atualizar a tabela de resultados com evidencias reais da execucao final.
+
+\section*{Registro de uso de IA}
+\addcontentsline{toc}{section}{Registro de uso de IA}
+
+Este relatorio teve apoio de redacao assistida por IA para organizacao textual, formatacao em \LaTeX{} e consolidacao dos casos de teste a partir das jornadas informadas. A revisao final, validacao tecnica e responsabilidade pelo conteudo entregue permanecem com os autores.
+
+\end{document}
